@@ -1,0 +1,61 @@
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    networks:
+      - taxi_network
+
+  backend:
+    build: ./backend
+    environment:
+      - DB_HOST=database
+      - DB_USER=user
+      - DB_PASSWORD=pass
+    ports:
+      - "5000:5000"
+    networks:
+      - taxi_network
+
+  order_processor:
+    build:
+      context: ./order_processor
+    environment:
+      - DB_HOST=database
+      - DB_USER=user
+      - DB_PASSWORD=pass
+    networks:
+      - taxi_network
+
+  database:
+    image: postgres:15
+    container_name: database
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: taxi_service
+    ports:
+      - "5432:5432"
+    volumes:
+      - database_data:/var/lib/postgresql/data
+      - ./database/init-scripts:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - taxi_network
+
+
+  monitoring:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - taxi_network
+
+volumes:
+  database_data:
+
+networks:
+  taxi_network:
+    driver: bridge
