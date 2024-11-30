@@ -14,7 +14,6 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
         if (response.ok) {
             const data = await response.json();
             alert(`Your order number is: ${data.order_number}`);
-            pollOrderStatus(data.order_id);
         } else {
             const error = await response.json();
             document.getElementById('responseMessage').textContent = `Error: ${error.error}`;
@@ -24,30 +23,6 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
     }
 });
 
-async function pollOrderStatus(orderId) {
-    try {
-        const response = await fetch(`http://localhost:5000/orders/${orderId}`);
-        if (response.ok) {
-            const order = await response.json();
-            document.getElementById('responseMessage').textContent = `
-                Order Details:
-                ID: ${order.id}
-                Pickup: ${order.pickup}
-                Destination: ${order.destination}
-                Status: ${order.status}
-                ${order.driver_name ? `Driver: ${order.driver_name}` : 'Waiting for a driver...'}
-            `;
-
-            if (order.status !== 'completed') {
-                setTimeout(() => pollOrderStatus(orderId), 5000);
-            }
-        } else {
-            document.getElementById('responseMessage').textContent = `Failed to fetch order details.`;
-        }
-    } catch (error) {
-        document.getElementById('responseMessage').textContent = `Error: ${error.message}`;
-    }
-}
 
 async function orderStatus(orderNumber) {
     try {

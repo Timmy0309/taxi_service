@@ -1,7 +1,7 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from flask import Flask, request, jsonify # type: ignore
+from flask_cors import CORS # type: ignore
+import psycopg2 # type: ignore
+from psycopg2.extras import RealDictCursor # type: ignore
 import logging
 import random
 
@@ -45,7 +45,7 @@ def create_order():
         if not data or 'pickup' not in data or 'destination' not in data:
             return jsonify({'error': 'Invalid data: pickup and destination are required'}), 400
 
-        order_number = generate_unique_order_number()  # Генерация номера заказа
+        order_number = generate_unique_order_number()
 
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -66,32 +66,6 @@ def create_order():
         logger.error(f"Непредвиденная ошибка: {e}")
         return jsonify({'error': 'An unexpected error occurred'}), 500
 
-
-@app.route('/orders/<int:order_id>', methods=['GET'])
-def get_order(order_id):
-    try:
-        connection = get_db_connection()
-        cursor = connection.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("""
-            SELECT o.id, o.pickup, o.destination, o.status, d.name AS driver_name
-            FROM orders o
-            LEFT JOIN drivers d ON o.driver_id = d.id
-            WHERE o.id = %s;
-        """, (order_id,))
-        result = cursor.fetchone()
-        cursor.close()
-        connection.close()
-
-        if result:
-            return jsonify(result)
-        else:
-            return jsonify({'error': 'Order not found'}), 404
-    except psycopg2.Error as e:
-        logger.error(f"Ошибка базы данных: {e}")
-        return jsonify({'error': 'Failed to retrieve order details'}), 500
-    except Exception as e:
-        logger.error(f"Непредвиденная ошибка: {e}")
-        return jsonify({'error': 'An unexpected error occurred'}), 500
 
 @app.route('/orders/number/<order_number>', methods=['GET'])
 def get_order_by_number(order_number):
