@@ -1,6 +1,6 @@
 import time
-import psycopg2
-from psycopg2.extras import RealDictCursor
+import psycopg2 # type: ignore
+from psycopg2.extras import RealDictCursor # type: ignore
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
