@@ -3,7 +3,6 @@ import psycopg2 # type: ignore
 from psycopg2.extras import RealDictCursor # type: ignore
 import logging
 
-# Настройка логгера
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -107,7 +106,6 @@ async def fetch_new_orders(queue):
             connection.close()
 
             for order in orders:
-                # Перед добавлением в очередь обновляем статус заказа на `queued`
                 connection = await get_db_connection()
                 cursor = connection.cursor()
                 cursor.execute("UPDATE orders SET status = %s WHERE id = %s;", ('queued', order['id']))

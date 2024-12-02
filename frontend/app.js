@@ -1,3 +1,13 @@
+
+const searchOrderForm = document.getElementById('searchOrderForm');
+const orderDetails = document.getElementById('orderDetails');
+const pickupLocationElem = document.getElementById('pickupLocation');
+const destinationElem = document.getElementById('destinationLocation');
+const statusElem = document.getElementById('status');
+const driverNameElem = document.getElementById('driverName');
+
+let currentOrderNumber = null;
+
 document.getElementById('orderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -13,47 +23,91 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
 
         if (response.ok) {
             const data = await response.json();
-            alert(`Your order number is: ${data.order_number}`);
+            console.log(data);
+            const orderNum = data.order_number;
+            showCustomAlert(`Ваш номер заказа: ${orderNum}`, orderNum);
+            // alert(`Ваш номер заказа: ${data.order_number}`);
         } else {
             const error = await response.json();
-            document.getElementById('responseMessage').textContent = `Error: ${error.error}`;
+            document.getElementById('responseMessage').textContent = `Ошибка: ${error.error}`;
         }
     } catch (error) {
-        document.getElementById('responseMessage').textContent = `Failed to send order: ${error.message}`;
+        document.getElementById('responseMessage').textContent = `Не удалось отправить заказ: ${error.message}`;
     }
 });
 
 
 async function orderStatus(orderNumber) {
+    if (orderNumber !== currentOrderNumber) return;
+
     try {
         const response = await fetch(`http://localhost:5000/orders/number/${orderNumber}`);
         if (response.ok) {
             const order = await response.json();
-            document.getElementById('orderDetails').textContent = `
-                Order Details:
-                ID: ${order.id}
-                Pickup: ${order.pickup}
-                Destination: ${order.destination}
-                Status: ${order.status}
-                ${order.driver_name ? `Driver: ${order.driver_name}` : 'Waiting for a driver...'}
-            `;
 
-            if (order.status !== 'completed') {
+            if (order && order.id) {
+                pickupLocationElem.textContent = order.pickup;
+                destinationElem.textContent = order.destination;
+                statusElem.textContent = order.status;
+                driverNameElem.textContent = order.driver_name || 'Пока не назначен';
+
+                orderDetails.classList.remove('hidden');
+            } else {
+                document.querySelector('.error').classList.remove('hidden');
+                document.querySelector('.error').textContent = `Заказ не найден.`;
+            }
+
+            if (order.status !== 'completed' && orderNumber === currentOrderNumber) {
                 setTimeout(() => orderStatus(orderNumber), 5000);
             }
         } else {
-            document.getElementById('orderDetails').textContent = `Order not found.`;
+            document.querySelector('.error').classList.remove('hidden');
+            document.querySelector('.error').textContent = `Заказ не найден.`;
         }
     } catch (error) {
-        document.getElementById('orderDetails').textContent = `Error: ${error.message}`;
+        document.querySelector('.error').classList.remove('hidden');
+        document.querySelector('.error').textContent = `Не удалось получить данные о заказе. ${error.message}`;
     }
 }
+
 
 document.getElementById('searchOrderForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const orderNumber = document.getElementById('orderNumber').value;
+
+    currentOrderNumber = orderNumber;
+
+    document.querySelector('.error').classList.add('hidden');
+    orderDetails.classList.add('hidden');
+
     orderStatus(orderNumber);
-    
 });
 
+
+function showCustomAlert(message, orderNumber = '') {
+    const alertBox = document.getElementById('customAlert');
+    const alertMessage = document.getElementById('alertMessage');
+    const closeAlert = document.getElementById('closeAlert');
+    const fillOrderNumber = document.getElementById('fillOrderNumber');
+    const orderNumberField = document.getElementById('orderNumber');
+
+    alertMessage.textContent = message;
+
+    alertBox.classList.remove('hidden');
+
+    if (orderNumber) {
+        fillOrderNumber.style.display = 'inline-block';
+        fillOrderNumber.onclick = () => {
+            orderNumberField.value = orderNumber;
+            alertBox.classList.add('hidden');
+        };
+    } else {
+        fillOrderNumber.style.display = 'none';
+    }
+
+    closeAlert.onclick = () => {
+        console.log('Close button clicked');
+        alertBox.classList.add('hidden');
+    };
+}

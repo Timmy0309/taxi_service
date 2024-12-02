@@ -4,33 +4,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Taxi Service</title>
+    <link rel="stylesheet" href="style.css">
+    <title>Анонимное такси</title>
 </head>
 
-<body>
-    <h1>Taxi Service</h1>
-    <form id="orderForm">
-        <label>
-            Pickup Location:
-            <input type="text" id="pickup" required>
-        </label>
-        <label>
-            Destination:
-            <input type="text" id="destination" required>
-        </label>
-        <button type="submit">Create Order</button>
-    </form>
+<body class="root">
+    <div class="container">
+        <img class="image" src="https://img.icons8.com/?size=100&id=T3rkLHcbdfQu&format=png&color=000000" alt="Anonymous Mask">
 
+        <h1 class="title">Анонимный сервис такси</h1>
+        <form class="form" id="orderForm">
+            <label class="label" for="pickup">
+                Откуда поедете
+            </label>
+            <input type="text" id="pickup" placeholder="Где вас подобрать" required>
 
-    <form id="searchOrderForm">
-        <label>
-            Enter Order Number:
-            <input type="text" id="orderNumber" required>
-        </label>
-        <button type="submit">Search Order</button>
-    </form>
-    <p id="orderDetails"></p>
+            <label class="label" for="destination">
+                Куда поедете
+            </label>
+            <input type="text" id="destination" placeholder="До куда нужно довезти" required>
 
+            <button class="button" type="submit">Вызвать такси</button>
+        </form>
+
+        <form class="form" id="searchOrderForm">
+            <label class="label" for="orderNumber">
+                Введите номер заказа:
+            </label>
+            <input type="text" id="orderNumber" placeholder="номер заказа" required>
+
+            <button class="button" type="submit">Поиск заказа</button>
+        </form>
+
+        <P class="error hidden"></P>
+
+        <div id="orderDetails" class="order-card hidden">
+            <h4 class="order-card__title">Подробности заказа</h4>
+            <div class="order-info">
+                <p class="order-info__paragraph"><strong>Откуда:</strong> <span id="pickupLocation"></span></p>
+                <p class="order-info__paragraph"><strong>Место прибытия:</strong> <span id="destinationLocation"></span></p>
+                <p class="order-info__paragraph"><strong>Статус:</strong> <span id="status"></span></p>
+                <p class="order-info__paragraph"><strong>Водитель:</strong> <span id="driverName"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden customAlert" id="customAlert">
+        <div class="alert-box">
+            <p id="alertMessage"></p>
+            <button id="fillOrderNumber">Автозаполнение</button>
+            <button id="closeAlert">Закрыть</button>
+        </div>
+    </div>
+    
     <script src="app.js"></script>
 </body>
 
