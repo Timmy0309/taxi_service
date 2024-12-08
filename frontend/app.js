@@ -26,13 +26,12 @@ document.getElementById('orderForm').addEventListener('submit', async (e) => {
             console.log(data);
             const orderNum = data.order_number;
             showCustomAlert(`Ваш номер заказа: ${orderNum}`, orderNum);
-            // alert(`Ваш номер заказа: ${data.order_number}`);
         } else {
             const error = await response.json();
-            document.getElementById('responseMessage').textContent = `Ошибка: ${error.error}`;
+            document.querySelector('error').textContent = `Ошибка: ${error.error}`;
         }
     } catch (error) {
-        document.getElementById('responseMessage').textContent = `Не удалось отправить заказ: ${error.message}`;
+        document.querySelector('error').textContent = `Не удалось отправить заказ: ${error.message}`;
     }
 });
 

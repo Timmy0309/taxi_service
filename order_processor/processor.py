@@ -36,14 +36,14 @@ async def assign_driver_to_order(order_id):
             driver_id = driver[0]
             cursor.execute(
                 "UPDATE orders SET driver_id = %s, status = %s WHERE id = %s;",
-                (driver_id, 'in_progress', order_id)
+                (driver_id, 'выполняется', order_id)
             )
             cursor.execute("UPDATE drivers SET status = %s WHERE id = %s;", ('busy', driver_id))
             connection.commit()
             logger.info(f"Driver {driver_id} assigned to order {order_id}")
             return driver_id
         else:
-            cursor.execute("UPDATE orders SET status = %s WHERE id = %s;", ('wait_taxi', order_id))
+            cursor.execute("UPDATE orders SET status = %s WHERE id = %s;", ('Ожидание свободного таксиста', order_id))
             connection.commit()
             logger.info(f"No drivers available for order {order_id}, will retry later.")
             return None
@@ -60,7 +60,7 @@ async def complete_order(order_id):
     cursor = connection.cursor()
 
     try:
-        cursor.execute("UPDATE orders SET status = %s WHERE id = %s;", ('completed', order_id))
+        cursor.execute("UPDATE orders SET status = %s WHERE id = %s;", ('Завершен', order_id))
         cursor.execute("SELECT driver_id FROM orders WHERE id = %s;", (order_id,))
         driver_id = cursor.fetchone()
 
@@ -100,7 +100,7 @@ async def fetch_new_orders(queue):
             connection = await get_db_connection()
             cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-            cursor.execute("SELECT id FROM orders WHERE status = %s OR status = %s;", ('new', 'wait_taxi'))
+            cursor.execute("SELECT id FROM orders WHERE status = %s OR status = %s;", ('новый заказ', 'wait_taxi'))
             orders = cursor.fetchall()
             cursor.close()
             connection.close()

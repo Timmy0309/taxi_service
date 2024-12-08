@@ -51,7 +51,7 @@ def create_order():
         cursor = connection.cursor()
         cursor.execute(
             "INSERT INTO orders (pickup, destination, status, order_number) VALUES (%s, %s, %s, %s) RETURNING id;",
-            (data['pickup'], data['destination'], 'new', order_number)
+            (data['pickup'], data['destination'], 'новый заказ', order_number)
         )
         order_id = cursor.fetchone()[0]
         connection.commit()
